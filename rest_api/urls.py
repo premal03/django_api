@@ -21,6 +21,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('students/<int:id>', views.student_details),
     path('students/', views.student_list),
-    path('studentapi/', views.Student.as_view())
+    path('studentgenericlist/', views.StudentGenericList.as_view()),
+    path('studentgenericlist/<int:pk>', views.StudentRetrieveUpdate.as_view()),
+    path('helloworld/', views.hello_world)
 ]
 

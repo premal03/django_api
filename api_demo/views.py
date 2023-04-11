@@ -10,7 +10,83 @@ from django.views.decorators.csrf import csrf_exempt
 #class based
 from django.utils.decorators import method_decorator
 from django.views import View
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework import status
+from rest_framework.generics import GenericAPIView
+from rest_framework.mixins import ListModelMixin, CreateModelMixin, RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin
 # Create your views here.
+
+
+#Generic API View and Mixins
+class StudentGenericList(GenericAPIView, ListModelMixin, CreateModelMixin):
+    queryset = Students.objects.all()
+    serializer_class = StudentSerializer
+
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
+
+
+# retrieve update and destroy - PK required
+class StudentRetrieveUpdate(GenericAPIView, RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin):
+    queryset = Students.objects.all()
+    serializer_class = StudentSerializer
+
+    def get(self, request, *args, **kwargs):
+        return self.retrieve(request, *args, **kwargs)
+
+    def put(self, request, *args, ** kwargs):
+        return self.update(request, *args, **kwargs)
+
+    def delete(self, request, *args, ** kwargs):
+        return self.destroy(request, *args, **kwargs)
+
+class StudentAPI(APIView):
+    def get(self, request, pk=None, format=None):
+        id=pk
+        if id is not None:
+            stu = Students.objects.get(id=id)
+            serializer = StudentSerializer(stu)
+            return Response(serializer.data)
+        stu = Students.objects.all()
+        serializer = StudentSerializer(stu, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, format=None):
+        serializer = StudentSerializer(request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'message': 'data created'}, status=status.HTTP_201_CREATED)
+        return Response(
+            {
+                'message': 'Invalid request',
+                'error': serializer.errors
+             },
+            status=status.HTTP_201_CREATED)
+
+@api_view(['GET', 'POST'])
+def hello_world(request):
+    if request.method == "GET":
+        return Response({'message': 'Hello world!!'})
+    elif request.method == "POST":
+        serializer = StudentSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'msg': 'Data created'})
+
+        return Response({'data': serializer.errors})
+    elif request.method == "PUT":
+        id = request.data.get('id')
+        stu = Students.objects.get(pk=id)
+        serializer = StudentSerializer(stu, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'message': 'Data updated'})
+        return Response({'data': serializer.errors})
 
 
 @method_decorator(csrf_exempt, name='dispatch')
