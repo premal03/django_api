@@ -1,13 +1,11 @@
 import io
-
-from django.shortcuts import render
 from .models import Students
 from .serializers import StudentSerializer
 from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-#class based
+# class based
 from django.utils.decorators import method_decorator
 from django.views import View
 from rest_framework.decorators import api_view
@@ -15,11 +13,102 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.generics import GenericAPIView
-from rest_framework.mixins import ListModelMixin, CreateModelMixin, RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin
-# Create your views here.
+from rest_framework.mixins import ListModelMixin, CreateModelMixin, RetrieveModelMixin, UpdateModelMixin, \
+    DestroyModelMixin
+
+#concrete view class
+from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
+# viewset
+from rest_framework import viewsets
+# ROUTER
 
 
-#Generic API View and Mixins
+#Basic Auth
+from rest_framework.authentication import BasicAuthentication, SessionAuthentication
+from rest_framework.permissions import IsAuthenticated, DjangoModelPermissions, DjangoModelPermissionsOrAnonReadOnly
+
+class StudentViewSets(viewsets.ViewSet):
+    def list(self, request):
+        stu = Students.objects.all()
+        serializer = StudentSerializer(stu, many=True)
+        return Response(serializer.data)
+
+    def retrieve(self, request, pk=None):
+        id = pk
+        if id is not None:
+            stu = Students.objects.get(id=id)
+            serializer = StudentSerializer(stu)
+            return Response(serializer.data)
+
+    def create(self, request):
+        serializer = StudentSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'success': True}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def update(self, request, pk):
+        id=pk
+        stu = Students.objects.get(id=id)
+        serializer = StudentSerializer(stu, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'success': True}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def partial_update(self, request, pk):
+        id=pk
+        stu = Students.objects.get(id=id)
+        serializer = StudentSerializer(stu, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'success': True}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def destroy(self, request, pk):
+        id = pk
+        stu = Students.objects.get(id=id)
+        stu.delete()
+        return Response({'success': True}, status=status.HTTP_201_CREATED)
+
+#viewsets.ReadOnlyModelViewSet: It gives two methods list and retrieve
+
+#customer Permission
+from api_demo.custompermission import MyPermission
+class StudentModelViewSets(viewsets.ModelViewSet):
+    queryset = Students.objects.all()
+    serializer_class = StudentSerializer
+    # To give this globally we can add this in settings.py file
+    authentication_classes = [SessionAuthentication]
+    # authentication_classes = [BasicAuthentication]
+    # permission_classes: IsAuthenticated, AllowAny, IsAdminUser
+    permission_classes = [MyPermission]
+    # permission_classes = [IsAuthenticated]
+    # permission_classes = [DjangoModelPermissions]
+# Third Party Packages:
+# - DRF - Access Policy
+# - Composed Permissions
+# - Rest Conditions
+# - DRY Rest Permissions
+# - DRF Roles
+# - DRF API Key
+# - DRF ROle Filter
+# - DRF PSQ
+#concrete view class
+class StudentConcreteList(ListCreateAPIView):
+    queryset = Students.objects.all()
+    serializer_class = StudentSerializer
+
+class StudentConcreteRetrieveUpdateDestroy(RetrieveUpdateDestroyAPIView):
+    queryset = Students.objects.all()
+    serializer_class = StudentSerializer
+
+
+
+
+
+
+# Generic API View and Mixins
 class StudentGenericList(GenericAPIView, ListModelMixin, CreateModelMixin):
     queryset = Students.objects.all()
     serializer_class = StudentSerializer
@@ -39,15 +128,16 @@ class StudentRetrieveUpdate(GenericAPIView, RetrieveModelMixin, UpdateModelMixin
     def get(self, request, *args, **kwargs):
         return self.retrieve(request, *args, **kwargs)
 
-    def put(self, request, *args, ** kwargs):
+    def put(self, request, *args, **kwargs):
         return self.update(request, *args, **kwargs)
 
-    def delete(self, request, *args, ** kwargs):
+    def delete(self, request, *args, **kwargs):
         return self.destroy(request, *args, **kwargs)
+
 
 class StudentAPI(APIView):
     def get(self, request, pk=None, format=None):
-        id=pk
+        id = pk
         if id is not None:
             stu = Students.objects.get(id=id)
             serializer = StudentSerializer(stu)
@@ -65,8 +155,9 @@ class StudentAPI(APIView):
             {
                 'message': 'Invalid request',
                 'error': serializer.errors
-             },
+            },
             status=status.HTTP_201_CREATED)
+
 
 @api_view(['GET', 'POST'])
 def hello_world(request):
@@ -163,6 +254,7 @@ def student_details(request, id):
     # return HttpResponse(json_data, content_type='application/json')
     return JsonResponse(serializer.data)
 
+
 @csrf_exempt
 def student_list(request):
     json_data = request.body
@@ -217,7 +309,3 @@ def student_list(request):
             }
             json_data = JSONRenderer().render(response)
             return HttpResponse(json_data, content_type='application/json')
-
-
-
-
