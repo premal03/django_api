@@ -29,3 +29,6 @@ urlpatterns = [
     path('verifytoken/', TokenVerifyView.as_view(), name='token_verify'),
 ]
 #http POST http://127.0.0.1:3000/generatetoken/ username="admin" password="admin"
+#http POST http://127.0.0.1:3000/gettoken/ username="admin" password="admin"
+#http POST http://127.0.0.1:3000/verifytoken/ token="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjgxNzk4NzcyLCJpYXQiOjE2ODE3OTg0NzIsImp0aSI6ImMxNGIxMTFlZWUyODQ3ZjQ4NmU0M2UwMmQxYjIxYTYwIiwidXNlcl9pZCI6MX0.ssA6lLbF3mPVDG2H-vNdF9lLD4S9reuBGzHqJ3lvwa4"
+#http POST http://127.0.0.1:3000/refreshtoken/ refresh="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTY4MTg4NDg3MiwiaWF0IjoxNjgxNzk4NDcyLCJqdGkiOiIwMGFiOTcyOTk1ZWE0YWI1YTJlOTIyYjg2ZGI1MTU4NyIsInVzZXJfaWQiOjF9.OV2g9hozrRKPFXObMOxaMfLEFQnBg2DBjnGDRXCykEY"

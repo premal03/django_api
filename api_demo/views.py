@@ -1,5 +1,6 @@
 import io
 from .models import Students
+from .pagination import CustomPagination
 from .serializers import StudentSerializer
 from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
@@ -22,10 +23,25 @@ from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIV
 from rest_framework import viewsets
 # ROUTER
 
+#JSON WEB TOKEN auth class
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 # Basic Auth
 from rest_framework.authentication import BasicAuthentication, SessionAuthentication, TokenAuthentication
-from rest_framework.permissions import IsAuthenticated, DjangoModelPermissions, DjangoModelPermissionsOrAnonReadOnly
+from rest_framework.permissions import IsAuthenticated, DjangoModelPermissions, DjangoModelPermissionsOrAnonReadOnly, \
+    IsAuthenticatedOrReadOnly
+
+#Throttling
+from rest_framework.throttling import AnonRateThrottle, UserRateThrottle, ScopedRateThrottle
+
+from .throttle import JackRateThrottle
+
+#django-filter, Searchfilter
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import SearchFilter, OrderingFilter
+
+#Pagination
+from rest_framework.pagination import PageNumberPagination
 
 
 class StudentViewSets(viewsets.ViewSet):
@@ -83,7 +99,8 @@ class StudentModelViewSets(viewsets.ModelViewSet):
     queryset = Students.objects.all()
     serializer_class = StudentSerializer
     # To give this globally we can add this in settings.py file
-    authentication_classes = [TokenAuthentication]
+    # authentication_classes = [JWTAuthentication]
+    # authentication_classes = [TokenAuthentication]
     # TOKEN AUTH: There are multiple methods to generate token but before that add rest_framework.auth in installed_app
     # then, python manage.py migrate
     #   1. Admin Panel: You will find one token table there you can create API KEY for particular user
@@ -95,10 +112,37 @@ class StudentModelViewSets(viewsets.ModelViewSet):
     # authentication_classes = [BasicAuthentication]
     # permission_classes: IsAuthenticated, AllowAny, IsAdminUser
     # permission_classes = [MyPermission]
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticatedOrReadOnly]
+    # permission_classes = [IsAuthenticated]
     # permission_classes = [DjangoModelPermissions]
+    # throttle_classes = [UserRateThrottle, AnonRateThrottle]
+    #custom user throttle
+    # throttle_classes = [AnonRateThrottle, JackRateThrottle]
+    # throttle_classes = [ScopedRateThrottle]
+    # throttle_scope = 'viewstu'
 
+    #django-filter
+    # filter_backends = [DjangoFilterBackend]
+    # filterset_fields = ['name', 'city']
 
+    #Search Filter
+    filter_backends = [SearchFilter]
+    search_fields = ['city']
+
+    #Ordering-filter
+    filter_backends = [OrderingFilter]
+    ordering_fields = ['name']
+    # ordering_fields = ['name','city']
+    # ordering_fields = '__all__'
+
+    #Pagination
+    pagination_class = CustomPagination
+
+    # overide queryset method
+    # def get_queryset(self):
+    #     user = self.request.user
+    #     #to filter out any things with ORM
+    #     return Students.objects.filter(city='ahmedabad')
 
 class StudentConcreteList(ListCreateAPIView):
     queryset = Students.objects.all()

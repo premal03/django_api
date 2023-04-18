@@ -2,6 +2,23 @@ https://rsinger86.github.io/django-lifecycle/
 CDRF Django
 wagtail.org
 
+#rest framework simple jwt settings
+# https://django-rest-framework-simplejwt.readthedocs.io/en/latest/settings.html
+
+# Throttling: https://www.django-rest-framework.org/api-guide/throttling/
+
+#DjangoFilterBackend
+- django-filter is a library includes a DjangoFilterBackend class supports highly customizable field filtering for
+Rest framework.
+- pip install django-filter
+- Add django-filter in installed_apps
+- Add below snippet in settings
+  ->  REST_FRAMEWORK = {
+        'DEFAULT_FILTER_BACKENDS': (
+            'django_filters.rest_framework.DjangoFilterBackend',
+        ),
+    }
+
 
 # IMP Third Party Packages:
 # https://www.django-rest-framework.org/api-guide/permissions/#:~:text=are%20also%20available.-,DRF%20%2D%20Access%20Policy,'%20Identity%20%26%20Access%20Management%20policies.
