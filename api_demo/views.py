@@ -16,16 +16,17 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.mixins import ListModelMixin, CreateModelMixin, RetrieveModelMixin, UpdateModelMixin, \
     DestroyModelMixin
 
-#concrete view class
+# concrete view class
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 # viewset
 from rest_framework import viewsets
 # ROUTER
 
 
-#Basic Auth
-from rest_framework.authentication import BasicAuthentication, SessionAuthentication
+# Basic Auth
+from rest_framework.authentication import BasicAuthentication, SessionAuthentication, TokenAuthentication
 from rest_framework.permissions import IsAuthenticated, DjangoModelPermissions, DjangoModelPermissionsOrAnonReadOnly
+
 
 class StudentViewSets(viewsets.ViewSet):
     def list(self, request):
@@ -48,7 +49,7 @@ class StudentViewSets(viewsets.ViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def update(self, request, pk):
-        id=pk
+        id = pk
         stu = Students.objects.get(id=id)
         serializer = StudentSerializer(stu, data=request.data)
         if serializer.is_valid():
@@ -57,7 +58,7 @@ class StudentViewSets(viewsets.ViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def partial_update(self, request, pk):
-        id=pk
+        id = pk
         stu = Students.objects.get(id=id)
         serializer = StudentSerializer(stu, data=request.data, partial=True)
         if serializer.is_valid():
@@ -71,41 +72,42 @@ class StudentViewSets(viewsets.ViewSet):
         stu.delete()
         return Response({'success': True}, status=status.HTTP_201_CREATED)
 
-#viewsets.ReadOnlyModelViewSet: It gives two methods list and retrieve
 
-#customer Permission
+# viewsets.ReadOnlyModelViewSet: It gives two methods list and retrieve
+
+# customer Permission
 from api_demo.custompermission import MyPermission
+
+
 class StudentModelViewSets(viewsets.ModelViewSet):
     queryset = Students.objects.all()
     serializer_class = StudentSerializer
     # To give this globally we can add this in settings.py file
-    authentication_classes = [SessionAuthentication]
+    authentication_classes = [TokenAuthentication]
+    # TOKEN AUTH: There are multiple methods to generate token but before that add rest_framework.auth in installed_app
+    # then, python manage.py migrate
+    #   1. Admin Panel: You will find one token table there you can create API KEY for particular user
+    #   2. CMD: python manage.py drf_create_token <username>
+    #   3. DRF also provide in built view function which returns token when
+    #   we pass username and password(obtain_auth_token)
+    #   4. Using Signals: When we create user at that time only it generate token
+    # authentication_classes = [SessionAuthentication]
     # authentication_classes = [BasicAuthentication]
     # permission_classes: IsAuthenticated, AllowAny, IsAdminUser
-    permission_classes = [MyPermission]
-    # permission_classes = [IsAuthenticated]
+    # permission_classes = [MyPermission]
+    permission_classes = [IsAuthenticated]
     # permission_classes = [DjangoModelPermissions]
-# Third Party Packages:
-# - DRF - Access Policy
-# - Composed Permissions
-# - Rest Conditions
-# - DRY Rest Permissions
-# - DRF Roles
-# - DRF API Key
-# - DRF ROle Filter
-# - DRF PSQ
-#concrete view class
+
+
+
 class StudentConcreteList(ListCreateAPIView):
     queryset = Students.objects.all()
     serializer_class = StudentSerializer
 
+
 class StudentConcreteRetrieveUpdateDestroy(RetrieveUpdateDestroyAPIView):
     queryset = Students.objects.all()
     serializer_class = StudentSerializer
-
-
-
-
 
 
 # Generic API View and Mixins

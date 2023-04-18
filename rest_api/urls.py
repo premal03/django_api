@@ -3,6 +3,8 @@ from django.contrib import admin
 from django.urls import path, include
 from api_demo import views
 from rest_framework.routers import DefaultRouter
+from api_demo.auth import CustomAuthToken
+from rest_framework_simplejwt.views import TokenRefreshView, TokenObtainPairView, TokenVerifyView
 
 router = DefaultRouter()
 
@@ -19,6 +21,11 @@ urlpatterns = [
     path('studentconcretelist', views.StudentConcreteList.as_view()),
     path('helloworld/', views.hello_world),
     path('studviewset', include(router.urls)),
-    path('auth/', include('rest_framework.urls', namespace='rest_framework'))
+    path('auth/', include('rest_framework.urls', namespace='rest_framework')),
+    path('generatetoken/', CustomAuthToken.as_view()),
+    #JWT
+    path('gettoken/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('refreshtoken/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('verifytoken/', TokenVerifyView.as_view(), name='token_verify'),
 ]
-
+#http POST http://127.0.0.1:3000/generatetoken/ username="admin" password="admin"

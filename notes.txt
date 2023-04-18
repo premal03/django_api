@@ -1,0 +1,40 @@
+https://rsinger86.github.io/django-lifecycle/
+CDRF Django
+wagtail.org
+
+
+# IMP Third Party Packages:
+# https://www.django-rest-framework.org/api-guide/permissions/#:~:text=are%20also%20available.-,DRF%20%2D%20Access%20Policy,'%20Identity%20%26%20Access%20Management%20policies.
+# - DRF - Access Policy
+# - Composed Permissions
+# - Rest Conditions
+# - DRY Rest Permissions
+# - DRF Roles
+# - DRF API Key
+# - DRF ROle Filter
+# - DRF PSQ
+# concrete view class
+
+JWT WEB TOKENS
+1. Django OAuth toolkit
+2. JSON Web Token Authentication(JWT)
+3. Hawk HTTP Authentication
+4. HTTP Signature Authentication
+5. Djoser
+6. django-rest-auth/ dj-rest-auth
+7. django-rest-framework-social-oauth2
+8. django-rest-knox
+9. drfpasswordless
+
+JWT in DRF
+1. pip install djangorestframework-simplejwt
+
+Configure JWT globally for the project
+- settings.py
+        REST_FRAMEWORK = {
+            'DEFAULT_AUTHENTICATION_CLASSES': (
+                'rest_framework_simplejwt.authentication.JWTAuthentication',
+            )
+        }
+- urls.py
+    from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
