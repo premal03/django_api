@@ -1,11 +1,36 @@
 from rest_framework import serializers
-from .models import Students
+from .models import Students, Singer, Song
+
+
+class SongSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Song
+        fields = ['id', 'title', 'singer', 'duration']
+
+
+class SingerSerializer(serializers.ModelSerializer):
+    # song = serializers.StringRelatedField(many=True, read_only=True)
+    # song = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    # song = serializers.HyperlinkedRelatedField(many=True, read_only=True, view_name='songviewset-detail')
+    # song = serializers.SlugRelatedField(many=True, read_only=True, slug_field='title')
+    # song = serializers.HyperlinkedIdentityField(view_name='songviewset-detail')
+    song = SongSerializer(many=True, read_only=True)
+    class Meta:
+        model = Singer
+        fields = ['id', 'name', 'gender', 'song']
 
 
 def start_with_r(value):
     if value[0].lower() == 'r':
         raise serializers.ValidationError('Name should not start from R')
     return value
+
+
+class StudentHyperLinkedSerializer(serializers.HyperlinkedModelSerializer):
+    url = serializers.HyperlinkedIdentityField(view_name='studentmodelhyperlink-detail')
+    class Meta:
+        model = Students
+        fields = ['name', 'rollno', 'city', 'url']
 
 
 class StudentSerializer(serializers.ModelSerializer):

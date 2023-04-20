@@ -1,7 +1,7 @@
 import io
-from .models import Students
-from .pagination import CustomPagination
-from .serializers import StudentSerializer
+from .models import Students, Singer, Song
+from .pagination import CustomPagination, CustomLimitPagination, CursorLimitPagination
+from .serializers import StudentSerializer, SingerSerializer, SongSerializer, StudentHyperLinkedSerializer
 from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
 from django.http import HttpResponse, JsonResponse
@@ -42,6 +42,22 @@ from rest_framework.filters import SearchFilter, OrderingFilter
 
 #Pagination
 from rest_framework.pagination import PageNumberPagination
+
+
+#Hyperlinkedmodel serializer
+class StudentHyperlinkedViewSet(viewsets.ModelViewSet):
+    queryset = Students.objects.all()
+    serializer_class = StudentHyperLinkedSerializer
+
+#Serializer Relation
+class SingerViewSet(viewsets.ModelViewSet):
+    queryset = Singer.objects.all()
+    serializer_class = SingerSerializer
+
+
+class SongViewSet(viewsets.ModelViewSet):
+    queryset = Song.objects.all()
+    serializer_class = SongSerializer
 
 
 class StudentViewSets(viewsets.ViewSet):
@@ -126,17 +142,19 @@ class StudentModelViewSets(viewsets.ModelViewSet):
     # filterset_fields = ['name', 'city']
 
     #Search Filter
-    filter_backends = [SearchFilter]
-    search_fields = ['city']
+    # filter_backends = [SearchFilter]
+    # search_fields = ['city']
 
     #Ordering-filter
-    filter_backends = [OrderingFilter]
-    ordering_fields = ['name']
+    # filter_backends = [OrderingFilter]
+    # ordering_fields = ['name']
     # ordering_fields = ['name','city']
     # ordering_fields = '__all__'
 
     #Pagination
-    pagination_class = CustomPagination
+    # pagination_class = CustomPagination
+    # pagination_class = CustomLimitPagination
+    pagination_class = CursorLimitPagination
 
     # overide queryset method
     # def get_queryset(self):

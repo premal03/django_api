@@ -10,6 +10,9 @@ router = DefaultRouter()
 
 router.register('studentviewset', views.StudentViewSets, basename='studentviewset')
 router.register('studentmodelviewset', views.StudentModelViewSets, basename='studentmodelviewset')
+router.register('studentmodelhyperlink', views.StudentHyperlinkedViewSet, basename='studentmodelhyperlink')
+router.register('singers', views.SingerViewSet, basename='singerviewset')
+router.register('songs', views.SongViewSet, basename='songviewset')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
